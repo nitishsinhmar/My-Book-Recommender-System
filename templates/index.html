@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Book Recommender</title>
+<link rel="stylesheet" href="/static/style.css">
+<link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+</head>
+<script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+
+
+<body>
+ <div class="navbar">
+  <h2>📚 Book App</h2>
+
+  <div class="nav-buttons">
+    <button onclick="goHome()">🏠 Home</button>
+    <button onclick="showFavorites()">❤️ Favorites</button>
+    <button onclick="showContact()">📞 Contact</button>
+  </div>
+</div>
+
+<h1>📚 Book Recommender</h1>
+
+<div class="search-box">
+  <input id="search" placeholder="🔍 Search Books.....">
+  <button onclick="getBooks()">✨ Search</button>
+</div>
+
+<!-- 🔥 SEARCH RESULTS -->
+<h2>Recommended Books</h2>
+<div id="results" class="grid"></div>
+
+<!-- 🔥 TOP BOOKS -->
+<h2>🔥 Top Books</h2>
+<div class="grid">
+  {% for book in top_books %}
+    <div class="card">
+      <div class="img-box">
+        <img src="{{ book.thumbnail or 'https://via.placeholder.com/150' }}">
+      </div>
+      <div class="info">
+        <h3>{{ book.title }}</h3>
+        <p>{{ book.author }}</p>
+        <p>⭐ {{ book.rating }} ({{ book.reviews }} reviews)</p>
+      </div>
+    </div>
+  {% endfor %}
+</div>
+
+
+
+ 
+<script>
+
+document.addEventListener("DOMContentLoaded", function() {
+
+  function getBooks() {
+    let query = document.getElementById("search").value;
+
+    fetch(`/recommend?q=${query}`)
+    .then(res => res.json())
+    .then(data => {
+      console.log(data);
+
+      let div = document.getElementById("results");
+      div.innerHTML = "";
+
+      data.forEach((book, index) => {
+        div.innerHTML += `
+          <div class="card" data-aos="zoom-in" data-aos-delay="${index * 100}">
+            <div class="img-box">
+              <img src="${book.thumbnail || 'https://via.placeholder.com/150'}">
+            </div>
+            <div class="info">
+              <h3>${book.title}</h3>
+              <p>${book.author}</p>
+              <p>⭐ ${book.rating || 'No Rating'} (${book.reviews || 0} reviews)</p>
+              <button onclick='addToFavorites(${JSON.stringify(book)})'>❤️</button>
+            </div>
+          </div>
+        `;
+      });
+    });
+  }
+
+  // ENTER key
+  document.getElementById("search").addEventListener("keypress", function(event) {
+    if (event.key === "Enter") {
+      getBooks();
+    }
+  });
+
+  // button click ke liye (agar hai)
+  window.getBooks = getBooks;
+
+});
+
+</script>
+<script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+
+  AOS.init({
+    duration: 1000,
+    once: true
+  });
+
+  function getBooks() {
+    let query = document.getElementById("search").value;
+
+    fetch(`/recommend?q=${query}`)
+    .then(res => res.json())
+    .then(data => {
+      console.log(data);
+
+      let div = document.getElementById("results");
+      div.innerHTML = "";
+
+      data.forEach((book, index) => {
+        div.innerHTML += `
+          <div class="card" data-aos="zoom-in" data-aos-delay="${index * 100}">
+            <div class="img-box">
+              <img src="${book.thumbnail || 'https://via.placeholder.com/150'}">
+            </div>
+            <div class="info">
+              <h3>${book.title}</h3>
+              <p>${book.author}</p>
+              <p>⭐ ${book.rating || 'No Rating'} (${book.reviews || 0} reviews)</p>
+              <button onclick='addToFavorites(${JSON.stringify(book)})'>❤️</button>
+            </div>
+          </div>
+        `;
+      });
+    });
+  }
+
+  document.getElementById("search").addEventListener("keypress", function(event) {
+    if (event.key === "Enter") {
+      getBooks();
+    }
+  });
+
+  window.getBooks = getBooks;
+
+});
+</script>
+</body>
+</html>
